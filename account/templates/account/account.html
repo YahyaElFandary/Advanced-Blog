@@ -2,6 +2,13 @@
 
 
 {% block content %}
+<style type="text/css">
+.blog-posts{
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+}
+</style>
 <h2>Account</h2>
 <form method="post">
   {% csrf_token %}
@@ -20,6 +27,23 @@
     <a href="{% url 'password_change' %}"></a>Change Password
   </button>
 </form>
-
+<div class="container mt-4 p-4">
+  <div class="row">
+    <div class="blog-posts">
+      <h3 class="mb-3 font-weight-normal">Blog posts:</h3>
+      {% if blog_posts %}
+      <ul>
+        {% for post in blog_posts %}
+          <a href="{% url 'blog:detail' post.slug %}" style="text-decoration: none;">
+            <li class="list-group-item">{{post.title}}</li>
+          </a>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>You have no blog posts. Create post <a href="{% url 'blog:create' %}">here</a>.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
 {% endblock content %}

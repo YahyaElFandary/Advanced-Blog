@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'personal',
     'account',
+    'BlogApp',
 ]
 
 MIDDLEWARE = [
@@ -122,5 +123,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-
+STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static'),
+        os.path.join(BASE_DIR, 'media')
+]
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_cdn')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mdeia_cdn')
