@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CreateBlogPostForm, UpdateBlogPostForm
 from account.models import Account
 from .models import BlogPost
-
+from django.db.models import Q
+from django.http import HttpResponse
 
 def create_blog_view(request):
     context = {}
@@ -18,6 +19,7 @@ def create_blog_view(request):
         obj.author = author
         obj.save()
         form = CreateBlogPostForm()
+        return redirect('home')
     context['form'] = form
     return render(request,'blog/create_blog.html', context)
 
@@ -37,6 +39,8 @@ def update_blog_view(request, slug):
         return redirect('must_authenticate')
 
     blog_post = get_object_or_404(BlogPost, slug=slug)
+    if blog_post.author != user:
+        return HttpResponse('you are not the author of that post')
     if request.POST:
         form = UpdateBlogPostForm(request.POST or None, request.FILES or None, instance=blog_post)
         if form.is_valid():
@@ -44,6 +48,7 @@ def update_blog_view(request, slug):
             obj.save()
             context['success_message'] = 'Updated'
             blog_post = obj
+            return redirect('home')
     form = UpdateBlogPostForm(
         initial = {
             'title': blog_post.title,
@@ -54,3 +59,16 @@ def update_blog_view(request, slug):
 
     context['form'] = form
     return render(request, 'blog/edit_blog.html', context)
+
+def get_blog_queryset(query=None):
+    queryset = []
+    queries = query.split(" ")
+    for q in queries:
+        posts = BlogPost.objects.filter(
+                Q(title__icontains=q) |
+                Q(body__icontains=q)
+            ).distinct()
+
+        for post in posts:
+            queryset.append(post)
+    return list(set(queryset))
